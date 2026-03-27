@@ -1,0 +1,27 @@
+[project]
+name = "ragchat-server"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "asyncpg>=0.31.0",
+    "colorlog>=6.10.1",
+    "dotenv>=0.9.9",
+    "fastapi>=0.135.2",
+    "langchain>=1.2.13",
+    "langchain-core>=1.2.22",
+    "langchain-huggingface>=1.2.1",
+    "langchain-openai>=1.1.12",
+    "pgvector>=0.4.2",
+    "psycopg>=3.3.3",
+    "psycopg2>=2.9.11",
+    "pydantic>=2.12.5",
+    "sqlalchemy[asyncio]>=2.0.48",
+    "uvicorn>=0.42.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9.0.2",
+]
