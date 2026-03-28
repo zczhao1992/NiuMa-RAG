@@ -5,4 +5,4 @@ from src.models.collection import Collection
 
 class CollectionDao(BaseDao):
     def __init__(self, db: AsyncSession):
-        super().__init__(db, Collection)
+        super().__init__(db, model=Collection, primary_key="uuid")
