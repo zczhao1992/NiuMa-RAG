@@ -117,3 +117,91 @@ async def delete_collection_by_id(uuid: str):
     except Exception as e:
         show_toast(f"删除{uuid} 记录失败：{e}", False)
     return None
+
+
+async def get_files(collection_id: str):
+    try:
+        response = requests.get(
+            backend_url + "files/", json={"collection_id": collection_id})
+        if response.status_code != 200:
+            show_toast(f"请求失败，状态码：{response.status_code}", False)
+            return None
+
+        try:
+            result = response.json()
+        except ValueError as e:
+            show_toast(f"解析响应 JSON 失败：{e}", False)
+            return None
+
+        if result.get("code") == 0:
+            return result["data"]
+
+    except Exception as e:
+        show_toast(f"获取记录失败：{e}", False)
+    return None
+
+
+async def upload_file(collection_id: str, files):
+    try:
+        response = requests.post(
+            backend_url + "files/", files=files, data={"collection_id": collection_id})
+        if response.status_code != 200:
+            show_toast(f"请求失败，状态码：{response.status_code}", False)
+            return None
+
+        try:
+            result = response.json()
+        except ValueError as e:
+            show_toast(f"解析响应 JSON 失败：{e}", False)
+            return None
+
+        if result.get("code") == 0:
+            return result["data"]
+
+    except Exception as e:
+        show_toast(f"获取记录失败：{e}", False)
+    return None
+
+
+async def delete_file(file_id: str):
+    try:
+        response = requests.delete(
+            backend_url + "files/", json={"file_id": file_id})
+        if response.status_code != 200:
+            show_toast(f"请求失败，状态码：{response.status_code}", False)
+            return None
+
+        try:
+            result = response.json()
+        except ValueError as e:
+            show_toast(f"解析响应 JSON 失败：{e}", False)
+            return None
+
+        if result.get("code") == 0:
+            return result["data"]
+
+    except Exception as e:
+        show_toast(f"删除{file_id} 记录失败：{e}", False)
+    return None
+
+
+async def get_chunks(file_id: str):
+    try:
+        response = requests.get(
+            backend_url + "chunks/file/" + file_id)
+        if response.status_code != 200:
+            show_toast(f"请求失败，状态码：{response.status_code}", False)
+            return None
+
+        try:
+            result = response.json()
+        except ValueError as e:
+            show_toast(f"解析响应 JSON 失败：{e}", False)
+            return None
+
+        if result.get("code") == 0:
+            return result["data"]
+
+    except Exception as e:
+        show_toast(f"获取记录失败：{e}", False)
+    return None
