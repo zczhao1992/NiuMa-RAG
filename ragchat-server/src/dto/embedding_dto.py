@@ -12,7 +12,7 @@ class EmbeddingDto(BaseModel):
     collection_id: Optional[UUID]
     embedding_vector: Vector
     search_vector: Optional[str]
-    cmetadata: Optional[Json]
+    cmetadata: Optional[Json] = None
     create_time: datetime
 
     model_config = {

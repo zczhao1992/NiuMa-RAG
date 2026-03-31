@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.dao.chunk_dao import ChunkDao
 from src.dto.chunk_dto import ChunkDto
 from src.services.base_service import BaseService
+from src.dto.chunk_embedding_dto import ChunkEmbeddingDto
 
 
 class ChunkService(BaseService):
@@ -39,15 +40,18 @@ class ChunkService(BaseService):
             ) for chunk in chunks
         ]
 
+    async def query_embedding_chunks(self):
+        results = await self.dao.query_embedding_chunks()
+        if results:
+            return [ChunkEmbeddingDto.model_validate(result) for result in results]
+        return None
+
+    async def batch_update_status_by_uuids(self, uuids: list[UUID], new_status: int):
+        await self.dao.batch_update_status_by_uuids(uuids, new_status)
+
     async def delete_chunks_by_file_id(self, file_id: str) -> bool:
 
         if not file_id:
             return False
 
-        return await self.dao.delete_by_file_id(file_id)
-
-    # async def query_embedding_chunks(self):
-    #     results = await self.dao.query_embedding_chunks()
-    #     if results:
-    #         return [Chun]
-    #     return None
+        return await self.dao.delete_chunks_by_file_id(file_id)
