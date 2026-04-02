@@ -6,7 +6,8 @@ from src.api.v1 import (
     user_router,
     collections_router,
     files_router,
-    chunks_router
+    chunks_router,
+    dicts_router
 )
 
 router = APIRouter(prefix="/api")
@@ -18,5 +19,6 @@ router_v1.include_router(user_router)
 router_v1.include_router(collections_router)
 router_v1.include_router(files_router)
 router_v1.include_router(chunks_router)
+router_v1.include_router(dicts_router)
 
 router.include_router(router_v1)

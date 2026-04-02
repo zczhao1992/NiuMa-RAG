@@ -205,3 +205,49 @@ async def get_chunks(file_id: str):
     except Exception as e:
         show_toast(f"获取记录失败：{e}", False)
     return None
+
+
+async def get_dict(key, default_value=""):
+    try:
+        response = requests.get(
+            backend_url + "dicts/" + key)
+        if response.status_code != 200:
+            show_toast(f"请求失败，状态码：{response.status_code}", False)
+            return default_value
+
+        try:
+            result = response.json()
+        except ValueError as e:
+            show_toast(f"解析响应 JSON 失败：{e}", False)
+            return default_value
+
+        if result.get("code") == 0:
+            if result["data"] is None or result["data"]["value"] is None or result["data"]["value"].strip() == "":
+                return default_value
+
+        return result["data"]["value"]
+
+    except Exception as e:
+        show_toast(f"获取记录失败：{e}", False)
+    return default_value
+
+
+async def batch_upsert_dicts(items: List[dict]):
+    try:
+        response = requests.post(
+            backend_url + "dicts/batch-upsert", json=items)
+
+        if response.status_code != 200:
+            show_toast(f"请求失败，状态码：{response.status_code}", False)
+            return False
+        try:
+            result = response.json()
+        except ValueError as e:
+            show_toast(f"解析响应 JSON 失败：{e}", False)
+            return False
+
+        if result.get("code") == 0:
+            return True
+    except Exception as e:
+        show_toast(f"设置失败：{e}", False)
+    return False

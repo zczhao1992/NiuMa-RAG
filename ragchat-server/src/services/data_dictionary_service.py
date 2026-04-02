@@ -8,3 +8,14 @@ class DataDictionaryService(BaseService):
 
     def __init__(self, db: AsyncSession):
         super().__init__(DataDictionaryDao(db), DataDictionaryDto)
+        self.dao: DataDictionaryDao = self.dao
+
+    async def get_by_key(self, key: str):
+        dict = await self.dao.get_by_key(key)
+
+        if dict:
+            return DataDictionaryDto.model_validate(dict)
+        return None
+
+    async def batch_upsert_dicts(self, items: list[dict]):
+        await self.dao.batch_upsert_dicts(items)
