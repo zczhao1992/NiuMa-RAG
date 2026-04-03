@@ -1,4 +1,8 @@
+import asyncio
 import streamlit as st
+import pandas as pd
+from api import get_users, chat, get_collections
+from base_message import HumanMessage, AIMessage
 
 st.set_page_config(page_title="首页", page_icon=":bar_chart:", layout="wide")
 
@@ -61,19 +65,75 @@ chat_container = st.container()
 
 input_container = st.container(key="input_container")
 
+# 获取用户列表
+user_list = {}
+users = asyncio.run(get_users())
+
+if users:
+    user_list = {user["name"]: user["id"] for user in users}
+
+user_display_options = list(user_list.keys())
+
+
+collection_list = {}
+collections = asyncio.run(get_collections())
+if collections:
+    collection_list = {collection["name"]: collection["uuid"]
+                       for collection in collections}
+collection_display_options = list(collection_list.keys())
+collection_display_options.insert(0, "选择知识空间")
 
 with top_container:
     st.selectbox(label="选择知识空间",
-                 options=("空间A", "空间B", "空间C"),
+                 options=collection_display_options,
+                 key="home_selected_collection",
+                 label_visibility="collapsed",
                  index=None,
                  placeholder="请选择知识空间")
 
 
-with chat_container:
-    with st.chat_message('user'):
-        st.markdown("你好")
-    with st.chat_message('assistant'):
-        st.markdown("我是AI")
+def handle_user_input():
+    user_input = st.session_state.get("user_input", "")
+    selected_user_id = user_list[st.session_state["selected_user"]]
+
+    if user_input:
+        user_message_key = "messages-" + selected_user_id
+        st.session_state[user_message_key].append(
+            HumanMessage(content=user_input))
+
+        if st.session_state["home_selected_collection"] == "选择知识空间":
+            selected_collection_id = ""
+        else:
+            selected_collection_id = collection_list[st.session_state["home_selected_collection"]]
+
+        ai_message = asyncio.run(
+            chat(selected_user_id, user_input, selected_collection_id))
+        if ai_message is None:
+            st.session_state[user_message_key].append(
+                AIMessage(content="AI 消息获取失败"))
+        else:
+            st.session_state[user_message_key].append(
+                AIMessage(content=ai_message["content"]))
+
+
+async def show_chat_message(user_id: str):
+    chat_container.empty()
+    user_message_key = "messages-" + user_id
+    if user_message_key not in st.session_state:
+        st.session_state[user_message_key] = []
+    with chat_container:
+        for message in st.session_state[user_message_key]:
+            if isinstance(message, HumanMessage):
+                with st.chat_message('user'):
+                    st.markdown(message.content)
+            elif isinstance(message, AIMessage):
+                with st.chat_message('assistant'):
+                    st.markdown(message.content)
+
+if "selected_user" not in st.session_state:
+    st.session_state["selected_user"] = user_display_options[0] if user_display_options else None
+
+asyncio.run(show_chat_message(user_list[st.session_state["selected_user"]]))
 
 with input_container:
     col1, col2 = st.columns([1, 9], gap='small')
@@ -81,8 +141,13 @@ with input_container:
     with col1:
         st.selectbox(
             label="用户选择",
-            options=["用户1", "用户2", "用户3"],
+            options=user_display_options,
+            key="selected_user",
             label_visibility='collapsed'
         )
     with col2:
-        st.chat_input('请输入信息')
+        st.chat_input(
+            f"{st.session_state["selected_user"]}说: 请输入信息...",
+            key="user_input",
+            on_submit=handle_user_input
+        )

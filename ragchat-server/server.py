@@ -6,7 +6,7 @@ import signal
 
 def handle_shutdown(signum, frame):
     print("shut down...")
-    sys.exit(0)
+    # sys.exit(0)
 
 
 signal.signal(signal.SIGINT, handle_shutdown)

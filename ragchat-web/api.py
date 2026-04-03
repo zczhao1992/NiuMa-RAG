@@ -251,3 +251,56 @@ async def batch_upsert_dicts(items: List[dict]):
     except Exception as e:
         show_toast(f"设置失败：{e}", False)
     return False
+
+
+async def get_users():
+    try:
+        response = requests.get(backend_url + "user/")
+
+        if response.status_code != 200:
+            show_toast(f"请求失败，状态码：{response.status_code}", False)
+            return []
+        try:
+            result = response.json()
+
+        except ValueError as e:
+            show_toast(f"解析响应 JSON 失败：{e}", False)
+            return []
+
+        if result.get("code") == 0:
+            return result.get("data", [])
+    except Exception as e:
+        show_toast(f"获取用户列表失败：{e}", False)
+    return []
+
+
+async def chat(user_id: str, message: str, collection_id: str = None):
+    print("========================")
+    print(user_id, collection_id, message)
+    try:
+        data = {
+            "user_id": user_id,
+            "collection_id": collection_id,
+            "message": message
+        }
+
+        headers = {"Content-Type": "application/json"}
+        response = requests.post(
+            backend_url + "chat/", json=data, headers=headers)
+
+        if response.status_code != 200:
+            show_toast(f"请求失败，状态码：{response.status_code}", False)
+            return None
+        try:
+            result = response.json()
+
+        except ValueError as e:
+            show_toast(f"解析响应 JSON 失败：{e}", False)
+            return None
+
+        if result.get("code") == 0:
+            return result["data"]
+    except Exception as e:
+        print(f"Debug - 详细错误原因: {e}")
+        show_toast(f"获取聊天失败：{e}", False)
+        return None
