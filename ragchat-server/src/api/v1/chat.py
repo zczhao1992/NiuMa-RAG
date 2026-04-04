@@ -25,9 +25,12 @@ async def chat_with_user(req: ChatRequest, db: AsyncSession = Depends(get_db)):
 
     chat_model_handler = ChatModelHandler()
 
-    if req.collection_id:
+    if not req.collection_id:
         response = await chat_model_handler.get_llm_response(req.user_id, req.message)
-        if not response:
-            return APIContract.error("AI大模型会话失败")
+    else:
+        response = await chat_model_handler.get_llm_rag_response(req.user_id, req.collection_id, req.message)
 
-        return APIContract.success(response)
+    if not response:
+        return APIContract.error("AI大模型会话失败")
+
+    return APIContract.success(response)

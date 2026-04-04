@@ -1,5 +1,8 @@
 import re
+import os
 import jieba
+from html import unescape
+from src.config.conf import PROJECT_DIR
 
 protected_words = [
     'http', 'https', 'ftp', 'tcp', 'file',
@@ -46,6 +49,10 @@ def clean_text(text: str) -> str:
     if not text:
         return ""
 
+    text = re.sub(r'<[^>]+>', '', text)
+
+    text = unescape(text)
+
     # 1. 先去除干扰信息（URL、Email）
     text = re.sub(r"(https?|ftp|file)://[^\s]+", "", text)
     text = re.sub(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-za-z]{2,}", "", text)
@@ -60,10 +67,17 @@ def clean_text(text: str) -> str:
     return cleaned_text
 
 
-def to_query(text: str):
+def to_query(text: str, mode: str = 'search'):
     cleaned_text = clean_text(text)
+    words = None
 
-    words = jieba.lcut(cleaned_text, cut_all=True)
+    if mode == "full":
+        words = jieba.lcut(cleaned_text, cut_all=True)
+    elif mode == "exact":
+        words = jieba.lcut(cleaned_text, cut_all=False)
+    else:
+        words = jieba.cut_for_search(cleaned_text)
+
     filtered_words = [word for word in words if word not in stopwords]
     result = " | ".join(filtered_words)
     return result
