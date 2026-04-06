@@ -1,11 +1,14 @@
 import asyncio
-from src.db.pg_db import get_db
+from src.db.pg_db import get_db, create_async_connection
 from src.handler.llm_model.llm_factory import LLMFactory
 from src.handler.prompt.prompt_template import CustomPromptTemplate
 from src.services.data_dictionary_service import DataDictionaryService
 from langchain_core.messages import AIMessage, HumanMessage
+from langchain_core.runnables import RunnableWithMessageHistory
 from src.handler.search import search_handler_map, SearchMode
 from src.services.chunk_service import ChunkService
+from src.handler.callback_handler import CustomCallbackHandler
+from langchain_community.chat_message_histories import PostgresChatMessageHistory
 
 
 class ChatModelHandler:
@@ -33,13 +36,30 @@ class ChatModelHandler:
 
         chain = prompt | llm
 
-        return chain
+        # 增加记忆
+        async_connection = await create_async_connection()
+
+        chain_with_message_history = RunnableWithMessageHistory(
+            chain,
+            lambda session_id: PostgresChatMessageHistory(
+                table_name="user_chat_history",
+                session_id=session_id,
+                connection_string=async_connection
+            ),
+            input_messages_key="question",
+            history_messages_key="chat_history"
+        )
+
+        return chain_with_message_history
 
     async def get_llm_response(self, user_id, message):
         user_message = HumanMessage(content=message)
         chain = await self.init_chain(False)
 
-        response = await chain.ainvoke({"question": user_message})
+        config = {"configurable": {"session_id": user_id},
+                  "callbacks": [CustomCallbackHandler()]}
+
+        response = await chain.ainvoke({"question": user_message}, config=config)
         result = {}
 
         if isinstance(response, AIMessage):
@@ -74,7 +94,9 @@ class ChatModelHandler:
 
         context_str = await self._build_context(chunk_ids)
 
-        response = await chain.ainvoke({"question": user_message, "context": context_str})
+        config = {"configurable": {"session_id": user_id},
+                  "callbacks": [CustomCallbackHandler()]}
+        response = await chain.ainvoke({"question": user_message, "context": context_str}, config=config)
         result = {}
 
         if isinstance(response, AIMessage):

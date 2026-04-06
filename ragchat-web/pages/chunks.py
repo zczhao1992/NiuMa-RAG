@@ -3,7 +3,9 @@ import streamlit as st
 import pandas as pd
 from api import get_chunks
 from utils import show_toast
+from hidden_pages import hide_pages
 
+hide_pages()
 
 if "select_file" not in st.session_state:
     st.switch_page("pages/03_rag.py")

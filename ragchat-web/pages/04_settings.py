@@ -1,8 +1,11 @@
 import asyncio
 import streamlit as st
-from api import batch_upsert_dicts, get_dict
+from api import batch_upsert_dicts, get_dict, get_users, clear_chat_history
 
 from utils import show_toast
+from hidden_pages import hide_pages
+
+hide_pages()
 
 st.set_page_config(page_title="设置", layout="wide")
 st.title("设置")
@@ -91,11 +94,29 @@ with tabs[0]:
             else:
                 show_toast("保存deepseek配置失败", False)
 with tabs[1]:
-    st.subheader('聊天记录')
+    st.subheader('清除聊天记录')
+    user_list = {}
 
-    st.selectbox("选择用户", ["用户A", "用户B", "用户C"])
-    st.button("清除聊天记录")
+    lists = asyncio.run(get_users())
+    if lists:
+        for user in lists:
+            user_list[user["name"]] = user["id"]
 
+    display_options = list(user_list.keys())
+
+    if "selected_clear_user" not in st.session_state:
+        st.session_state["selected_clear_user"] = display_options[0] if display_options else user_list[0]
+
+    st.selectbox("选择用户",
+                 display_options,
+                 key="selected_clear_user",
+                 label_visibility="collapsed"
+                 )
+
+    if st.button("清除聊天记录"):
+        selected_user_id = user_list[st.session_state["selected_clear_user"]]
+        asyncio.run(clear_chat_history(user_id=selected_user_id))
+        show_toast("清除聊天记录成功！")
 
 with tabs[2]:
     st.subheader('系统提示词模版')

@@ -1,8 +1,11 @@
 import asyncio
 import streamlit as st
 import pandas as pd
-from api import get_users, chat, get_collections
+from api import get_users, chat, get_collections, get_chat_history
 from base_message import HumanMessage, AIMessage
+from hidden_pages import hide_pages
+
+hide_pages()
 
 st.set_page_config(page_title="首页", page_icon=":bar_chart:", layout="wide")
 
@@ -65,6 +68,27 @@ chat_container = st.container()
 
 input_container = st.container(key="input_container")
 
+
+async def get_history_messages(user_id: str):
+    messages = await get_chat_history(user_id=user_id)
+
+    user_message_key = "messages-" + user_id
+
+    if user_message_key not in st.session_state:
+        st.session_state[user_message_key] = []
+
+    st.session_state[user_message_key].clear()
+
+    if messages:
+        for message in messages:
+            if message["type"] == "human":
+                st.session_state[user_message_key].append(
+                    HumanMessage(content=message["content"]))
+            elif message["type"] == "ai":
+                st.session_state[user_message_key].append(
+                    AIMessage(content=message["content"]))
+
+
 # 获取用户列表
 user_list = {}
 users = asyncio.run(get_users())
@@ -117,6 +141,8 @@ def handle_user_input():
 
 
 async def show_chat_message(user_id: str):
+    # await get_history_messages(user_id=user_id)
+
     chat_container.empty()
     user_message_key = "messages-" + user_id
     if user_message_key not in st.session_state:

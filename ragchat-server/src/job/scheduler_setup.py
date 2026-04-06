@@ -1,7 +1,7 @@
 import asyncio
 import uuid
 from datetime import datetime, timezone
-from pgvector.utils import Vector
+from pgvector.sqlalchemy import Vector
 from src.core.embedding_manager import get_embeddings
 from src.db.pg_db import get_db
 from src.dto.embedding_dto import EmbeddingDto

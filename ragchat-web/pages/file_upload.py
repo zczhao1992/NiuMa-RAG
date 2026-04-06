@@ -2,9 +2,9 @@ import asyncio
 import streamlit as st
 from api import upload_file, get_collections
 from utils import show_toast
-# from hidden_pages import hide_pages
+from hidden_pages import hide_pages
 
-# hide_pages()
+hide_pages()
 
 st.title("文件上传")
 

@@ -301,6 +301,51 @@ async def chat(user_id: str, message: str, collection_id: str = None):
         if result.get("code") == 0:
             return result["data"]
     except Exception as e:
-        print(f"Debug - 详细错误原因: {e}")
         show_toast(f"获取聊天失败：{e}", False)
         return None
+
+
+async def get_chat_history(user_id: str):
+    try:
+        response = requests.post(
+            backend_url + "chat/history?user_id=" + user_id)
+
+        if response.status_code != 200:
+            show_toast(f"请求失败，状态码：{response.status_code}", False)
+            return None
+
+        try:
+            result = response.json()
+        except ValueError as e:
+            show_toast(f"解析响应 JSON 失败：{e}", False)
+            return None
+
+        if result.get("code") == 0:
+            return result["data"]
+
+    except Exception as e:
+        show_toast(f"请求历史记录失败：{e}", False)
+    return None
+
+
+async def clear_chat_history(user_id: str):
+    try:
+        response = requests.post(
+            backend_url + "chat/clear-history?user_id=" + user_id)
+
+        if response.status_code != 200:
+            show_toast(f"请求失败，状态码：{response.status_code}", False)
+            return None
+
+        try:
+            result = response.json()
+        except ValueError as e:
+            show_toast(f"解析响应 JSON 失败：{e}", False)
+            return None
+
+        if result.get("code") == 0:
+            return result["data"]
+
+    except Exception as e:
+        show_toast(f"删除历史记录失败：{e}", False)
+    return None

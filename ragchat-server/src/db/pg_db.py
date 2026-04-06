@@ -1,3 +1,8 @@
+import urllib.parse
+import psycopg
+import asyncio
+import platform
+import sys
 import os
 import ssl
 from typing import AsyncGenerator
@@ -53,3 +58,16 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
     finally:
         if db:
             await db.close()
+
+
+async def create_async_connection():
+    db_url = get_db_url()
+
+    if "+asyncpg" in db_url:
+        db_url = db_url.replace("+asyncpg", "")
+    #  await psycopg.AsyncConnection.connect(db_url)
+    if "sslmode" not in db_url:
+        sep = "&" if "?" in db_url else "?"
+        db_url += f"{sep}sslmode=require"
+
+    return db_url

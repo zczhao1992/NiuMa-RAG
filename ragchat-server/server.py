@@ -2,6 +2,8 @@ import uvicorn
 import argparse
 import sys
 import signal
+import asyncio
+import platform
 
 
 def handle_shutdown(signum, frame):
@@ -14,6 +16,11 @@ signal.signal(signal.SIGTERM, handle_shutdown)
 
 
 if __name__ == "__main__":
+
+    if platform.system() == "Windows":
+        # 1. 强制设置策略为 Selector
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
     parser = argparse.ArgumentParser(description="Run the RAGCHAT server")
 
     parser.add_argument(
@@ -52,7 +59,7 @@ if __name__ == "__main__":
 
     try:
         uvicorn.run("src.main:app", host=args.host,
-                    port=args.port, reload=reload, log_level=args.log_level)
+                    port=args.port, reload=reload, log_level=args.log_level, loop="asyncio")
     except Exception as e:
         print(e)
         sys.exit(1)

@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID
 from pydantic import BaseModel, Json
-from pgvector import Vector
+from pgvector.sqlalchemy import Vector
 
 
 class EmbeddingDto(BaseModel):

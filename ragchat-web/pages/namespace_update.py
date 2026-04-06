@@ -1,6 +1,9 @@
 import asyncio
 import streamlit as st
 from api import update_collection
+from hidden_pages import hide_pages
+
+hide_pages()
 
 
 def save_to_backend(collection, name):

@@ -4,10 +4,10 @@ FROM
     (
     SELECT
         chunk_id,
-        ( embedding.search_vector <=> '{{query_embedding}}') AS similarity
+        ( embedding.embedding_vector <=> '{{query_embedding}}') AS similarity
         FROM embedding
         WHERE collection_id = '{{collection_id}}'
     )
 WHERE similarity <= {{vector_score_threshold}}
-ORDER BY similarity DESC
+ORDER BY similarity ASC
 LIMIT {{top_n}};

@@ -10,7 +10,7 @@ class Embedding(Base):
     file_id = Column(UUID)
     chunk_id = Column(UUID)
     collection_id = Column(UUID)
-    embedding_vector = Column(Vector)
+    embedding_vector = Column(Vector(1536))
     search_vector = Column(TSVECTOR)
     cmetadata = Column(JSON)
     create_time = Column(TIMESTAMP(timezone=True), nullable=False)

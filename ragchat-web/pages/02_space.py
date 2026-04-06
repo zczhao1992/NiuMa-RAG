@@ -2,6 +2,9 @@ import asyncio
 import streamlit as st
 import pandas as pd
 from api import get_collections, delete_collection_by_id
+from hidden_pages import hide_pages
+
+hide_pages()
 
 st.title("知识空间")
 

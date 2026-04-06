@@ -1,4 +1,21 @@
+import base64
 import streamlit as st
+
+
+logo_svg = """
+<svg width="400" height="60" xmlns="http://www.w3.org/2000/svg">
+  <text x="50%" y="50%" font-family="Microsoft YaHei, sans-serif" font-size="52" fill="#ff4b4b" text-anchor="middle" dominant-baseline="middle" font-weight="bold">
+    NiuMa RAG
+  </text>
+</svg>
+"""
+
+
+def get_svg_base64(svg_str):
+    return f"data:image/svg+xml;base64,{base64.b64encode(svg_str.encode()).decode()}"
+
+
+st.logo(get_svg_base64(logo_svg))
 
 pg = st.navigation([
     st.Page("pages/01_home.py", title="首页"),
