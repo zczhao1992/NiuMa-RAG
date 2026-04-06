@@ -7,8 +7,8 @@ _embeddings = None
 async def initialize_embeddings():
     global _embeddings
     try:
-        model_path = "D:/HuggingFace/bge-large-zh-v1.5"
-
+        # model_path = "D:/HuggingFace/bge-large-zh-v1.5"
+        model_path = "BAAI/bge-small-zh-v1.5"
         # 检测设备
         device = "cuda" if torch.cuda.is_available() else "cpu"
         # device = 'cpu'

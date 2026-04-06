@@ -33,8 +33,8 @@ col1, col2 = st.columns(2)
 with col1:
     st.success("**默认知识空间**")
     st.markdown("""
-    - **空间名称**：`python`
-    - **内容简介**：内置了丰富的 Python 核心开发文档与最佳实践。
+    - **空间名称**：`养生知识`
+    - **内容简介**：内置了养生的相关内容。
     """)
 
 with col2:
@@ -47,9 +47,9 @@ with col2:
 st.markdown("""
 ### 🛠️ 如何开始对话？
 1.  前往 **[知识库]** 页面。
-2.  在侧边栏选择知识空间：`python`。
+2.  在侧边栏选择知识空间：`养生知识`。
 3.  输入你的用户 ID：`zc`。
-4.  开始提问，例如：“*Python 中的装饰器是什么原理？*”
+4.  开始提问，例如：“*减肥的危害有哪些？*”
 """)
 
 st.markdown("---")
@@ -60,9 +60,9 @@ with st.expander("🛠️ 查看技术架构"):
     - **Frontend**: Streamlit
     - **Backend**: FastAPI / LangChain
     - **Database**: Neon Postgres (Vector / SQL)
-    - **LLM**: DeepSeek / OpenAI / Claude
+    - **LLM**: DeepSeek / OpenAI 
     - **Driver**: Psycopg (Synchronous Mode for stability)
     """)
 
 # 页脚
-st.caption("© 2024 NiuMa RAG - 让知识触手可及，让牛马不再加班。")
+st.caption("© 2026 NiuMa RAG - 让知识触手可及，让牛马不再加班。")
